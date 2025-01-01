@@ -1,12 +1,11 @@
-# تثبيت المكتبات اللازمة
+
 if (!require(shiny)) install.packages("shiny")
 if (!require(recommenderlab)) install.packages("recommenderlab")
 
-# تحميل المكتبات
 library(shiny)
 library(recommenderlab)
 
-# بيانات وهمية لتاريخ الشراء
+
 user_data <- matrix(
   c(5, 4, 0, 0, 3, 0,
     0, 0, 5, 4, 0, 0,
@@ -16,15 +15,15 @@ user_data <- matrix(
 )
 
 colnames(user_data) <- c("Laptop", "Mouse", "Keyboard", "Monitor", "Phone", "Tablet")
-rownames(user_data) <- c("User1", "User2", "User3")
+rownames(user_data) <- c("User01", "User02", "User03")
 
-# تحويل البيانات إلى مصفوفة تقييم
+
 ratings <- as(user_data, "realRatingMatrix")
 
-# تدريب نظام التوصيات
+
 rec_model <- Recommender(ratings, method = "UBCF")
 
-# واجهة المستخدم
+
 ui <- fluidPage(
   titlePanel("AI Shopping Assistant"),
   sidebarLayout(
@@ -39,16 +38,15 @@ ui <- fluidPage(
   )
 )
 
-# الخادم
 server <- function(input, output) {
   observeEvent(input$recommend, {
     user_id <- input$user
     
-    # تقديم التوصيات
+    
     recommendations <- predict(rec_model, ratings[user_id, ], n = 3)
     rec_list <- as(recommendations, "list")[[1]]
     
-    # عرض التوصيات
+
     output$recommendations <- renderTable({
       if (length(rec_list) == 0) {
         data.frame(Product = "No recommendations available")
@@ -59,5 +57,5 @@ server <- function(input, output) {
   })
 }
 
-# تشغيل التطبيق
+
 shinyApp(ui = ui, server = server)
